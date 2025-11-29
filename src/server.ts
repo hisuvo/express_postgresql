@@ -55,13 +55,25 @@ app.get("/", (req: Request, res: Response) => {
   });
 });
 
-app.post("/", (req: Request, res: Response) => {
-  console.log(req.body);
+app.post("/users", async (req: Request, res: Response) => {
+  try {
+    const { name, email } = req.body;
+    const result = await pool.query(
+      `INSERT INTO users(name, email) VALUES($1, $2) RETURNING *`,
+      [name, email]
+    );
 
-  res.status(201).json({
-    success: true,
-    message: "API is working",
-  });
+    res.status(201).json({
+      success: true,
+      message: "Data Insert successfully",
+      data: result.rows[0],
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
 });
 
 app.listen(port, () => {
