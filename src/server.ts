@@ -101,7 +101,7 @@ app.get("/users", async (req: Request, res: Response) => {
   }
 });
 
-app.get("/users/:id", async (req, res) => {
+app.get("/users/:id", async (req: Request, res: Response) => {
   try {
     const result = await pool.query(`SELECT * FROM users WHERE id = $1`, [
       req.params.id,
@@ -216,6 +216,33 @@ app.get("/todos", async (req: Request, res: Response) => {
       success: true,
       message: "Todos retrived succssfully",
       users: result.rows,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+      details: error,
+    });
+  }
+});
+
+app.get("/todos/:id", async (req: Request, res: Response) => {
+  try {
+    const result = await pool.query(`SELECT * FROM todos WHERE id=$1`, [
+      req.params.id,
+    ]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "data not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      meccess: "Data retrived successfully",
+      data: result.rows[0],
     });
   } catch (error: any) {
     res.status(500).json({
