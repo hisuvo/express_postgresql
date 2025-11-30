@@ -28,3 +28,74 @@
  * ? How use Pool with express.js and PostgreSQL
  * * -> pg.Pool({connectionString:"here keep connection string..."})
  */
+
+// ? (Parameterised Query / Safe Query)
+/**
+    // UPDATE users SET name=$1, email=$2 WHERE id=$3 RETURNING *;
+    // [name, email, req.params.id]
+
+    // ⭐ এটা কেমন কুয়েরি?
+
+    // এটা হলো Parameterized Query (বা Prepared Statement)।
+    // Node.js (PostgreSQL-এর pg লাইব্রেরি) এ $1, $2, $3 মানে হচ্ছে placeholders।
+    // পরে অ্যারের ভ্যালুগুলো নাম্বার অনুযায়ী বসে।
+
+    // ⭐ কেন ব্যবহার করা হয়?
+    // 1. SQL Injection Attack থেকে 100% সিকিউর
+
+    // যদি ইউজার name বা email input হিসেবে ভুল বা ক্ষতিকর কোড দেয়, তবুও ডাটাবেজ হ্যাক হবে না।
+    // কারণ PostgreSQL আগে ভ্যালুগুলোকে Pure data হিসেবে ধরে।
+
+    // উদাহরণ:
+
+    // ধরো ইউজার name-এ লিখেছে:
+
+    // "; DROP TABLE users; --
+
+    // Parameterized query থাকার কারণে ডাটাবেজ এটি ডাটা হিসেবে নেবে, কোড হিসেবে নয় → টেবিল কখনই ডিলিট হবে না।
+
+    // 2. নিরাপদ ডাটা binding
+    // $1 → name
+    // $2 → email
+    // $3 → id
+
+    // এভাবে ডাটা সঠিকভাবে বসে।
+
+    // 3. ডাটাবেজ পারফরম্যান্স ভালো
+
+    // Prepared statements সাধারণত দ্রুত execute হয়।
+
+    // **4. RETURNING ***
+
+    // কুয়েরি রান শেষে আপডেট হওয়া রো (row) রিটার্ন করে।
+    // API response দিতে সুবিধা হয়।
+
+ */
+
+// ? Which is best for delete all rows for data between DELETE FORM users and TRUNCATE TABLE users
+/** 
+// যদি তুমি শুধু টেবিল পুরো খালি করতে চাও → TRUNCATE TABLE is BEST
+
+// কারণ:
+
+// খুব দ্রুত
+
+// সেফ
+
+// auto increment reset
+
+// কম resource ব্যবহার
+
+// proper clean table structure
+
+// ➤ যদি শর্ত দিয়ে delete করতে চাও → DELETE is BEST
+
+// কারণ:
+
+// WHERE ব্যবহার করা যায়
+
+// constraint এর সাথে compatible
+
+// rollback সাপোর্ট
+
+*/
