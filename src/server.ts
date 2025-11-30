@@ -76,6 +76,53 @@ app.post("/users", async (req: Request, res: Response) => {
   }
 });
 
+app.get("/users", async (req: Request, res: Response) => {
+  try {
+    const result = await pool.query(`SELECT * FROM users`);
+
+    res.status(200).json({
+      success: true,
+      message: "users retrived succssfully",
+      users: result.rows,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+      details: error,
+    });
+  }
+});
+
+app.get("/users/:id", async (req, res) => {
+  try {
+    const result = await pool.query(`SELECT * FROM users WHERE id = $1`, [
+      req.params.id,
+    ]);
+
+    // when user not found then
+    if (result.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        message: "user not found",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "user retrived successfully",
+      user: result.rows,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+      details: error,
+    });
+  }
+});
+
 app.listen(port, () => {
   console.log(`server listening port No. ${port}`);
 });
